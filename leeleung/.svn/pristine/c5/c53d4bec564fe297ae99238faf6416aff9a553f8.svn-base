@@ -1,0 +1,185 @@
+package com.itwill.jumun.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.itwill.jumun.Jumun;
+import com.itwill.jumun.JumunProduct;
+import com.itwill.jumun.JumunProductService;
+import com.itwill.jumun.JumunService;
+
+
+
+
+@Controller
+public class JumunController {
+	
+	@Autowired
+	private JumunService jumunService;
+	
+	@Autowired
+	private JumunProductService jumunProductService;
+	
+	
+	////////////////////////////주문///////////////////////////////////////////
+	
+	@RequestMapping("/jumun_allList.do")
+	public String jumun_allList(Model model,HttpServletRequest request) {
+		
+		String forwardPath = "";
+		try {
+			List<Jumun> jumunList = jumunService.selectByAll();
+			model.addAttribute("jumunAllList", jumunList);
+			forwardPath = "forward:/WEB-INF/view/jumun_AllList.jsp";
+		} catch (Exception e) {
+			forwardPath = "forward:/WEB-INF/view/error.jsp";
+			e.printStackTrace();
+		}
+		return forwardPath;
+		
+	}
+	
+	@RequestMapping("/jumun_list.do")
+	public String jumun_list(@RequestParam(value = "memberNo",required = false, defaultValue = "-1") String memberNo, Model model) {
+		
+		String forwardPath = "";
+		try {
+			List<Jumun> jumunList = jumunService.selectByMemberNo(Integer.parseInt(memberNo));
+			model.addAttribute("jumunList", jumunList);
+			forwardPath = "forward:/WEB-INF/view/jumun_list.jsp";
+		} catch (Exception e) {
+			forwardPath = "forward:/WEB-INF/view/error.jsp";
+			e.printStackTrace();
+		}
+		return forwardPath;
+		
+	}
+	
+	@RequestMapping("/jumun_insert_form.do")
+	public String jumun_insert_form() {
+		String forwardPath = "";
+		forwardPath = "forward:/WEB-INF/view/jumun_insert_form.jsp";
+		return forwardPath;
+	}
+	
+	@RequestMapping(value = "/jumun_insert_action.do",method = RequestMethod.POST)
+	public String jumun_insert_action(@ModelAttribute Jumun jumun) {
+		String forwardPath = "";
+		try {
+			int insertOk = jumunService.insertJumun(jumun);
+			if(insertOk == 1) {
+				forwardPath = "redirect:jumunProduct_insert_action.do";
+			} else {
+				forwardPath = "forward:/WEB-INF/view/error.jsp";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			forwardPath = "forward:/WEB-INF/view/error.jsp";
+		}
+		return forwardPath;
+	}
+	
+	@RequestMapping("/jumun_delete_action.do")
+	public String jumun_delete_action(@RequestParam ("jumunNo") int jumunNo) {
+		String forwardPath = "";
+		try {
+			int deleteOk = jumunService.deleteJumun(jumunNo);
+			if(deleteOk == 1) {
+				forwardPath = "redirect:jumun_list.do";
+			} else {
+				forwardPath = "forward:/WEB-INF/view/error.jsp";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			forwardPath = "forward:/WEB-INF/view/error.jsp";
+		}
+		return forwardPath;
+	}
+	
+	
+	
+	/////////////////////////////주문 상품/////////////////////////////////////
+	@RequestMapping("/jumunProduct_allList.do")
+	public String jumunProduct_allList(Model model,HttpServletRequest request) {
+		
+		String forwardPath = "";
+		try {
+			List<JumunProduct> jumunProductList = jumunProductService.selectByAll();
+			model.addAttribute("jumunProductList", jumunProductList);
+			forwardPath = "forward:/WEB-INF/view/jumunProduct_allList.jsp";
+		} catch (Exception e) {
+			forwardPath = "forward:/WEB-INF/view/error.jsp";
+			e.printStackTrace();
+		}
+		return forwardPath;
+		
+	}
+	
+	@RequestMapping("/jumunProduct_list.do")
+	public String jumunProduct_list(@RequestParam(value = "jumunNo",required = false, defaultValue = "-1") String jumunNo, Model model) {
+		
+		String forwardPath = "";
+		try {
+			List<JumunProduct> jumunProductList = jumunProductService.selectByJumunNo(Integer.parseInt(jumunNo));
+			model.addAttribute("jumunProductList", jumunProductList);
+			forwardPath = "forward:/WEB-INF/view/jumunProduct_list.jsp";
+		} catch (Exception e) {
+			forwardPath = "forward:/WEB-INF/view/error.jsp";
+			e.printStackTrace();
+		}
+		return forwardPath;
+		
+	}
+	
+	
+	@RequestMapping("/jumunProduct_insert_action.do")
+	public String jumunProduct_insert_action(@ModelAttribute List<JumunProduct> jumunProductList) {
+		String forwardPath = "";
+		
+		try {
+			int errorCount = 0;
+			for (JumunProduct jumunProduct : jumunProductList) {
+				int insertOk = jumunProductService.insertJumunProduct(jumunProduct);
+				if(insertOk != 1) {
+					errorCount = 1;
+				}
+			}
+			
+			if (errorCount == 0) {
+				forwardPath = "redirect:jumun_complete_form.do";
+			}else {
+				forwardPath = "forward:/WEB-INF/view/error.jsp";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			forwardPath = "forward:/WEB-INF/view/error.jsp";
+		}
+		return forwardPath;
+	}
+	
+	@RequestMapping("/jumun_complete_form.do")
+	public String jumun_complete_form() {
+		String forwardPath = "";
+		
+		forwardPath = "forward:/WEB-INF/view/jumun_complete_form.jsp";
+		return forwardPath;
+	}
+	
+	@RequestMapping("/jumun_complete_action.do")
+	public String jumun_complete_action() {
+		String forwardPath = "";
+		
+		forwardPath = "redirect:main.do";
+		return forwardPath;
+	}
+	
+}
