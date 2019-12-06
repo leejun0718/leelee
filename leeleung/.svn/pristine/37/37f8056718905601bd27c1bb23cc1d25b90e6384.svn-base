@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.board.mapper.BoardQnaMapper">
+
+	<!-- 게시물 리스트 보기 -->
+	<select id="boardQnaList" parameterType="HashMap"
+		resultType="com.itwill.board.boardQna.BoardQna">
+		SELECT * FROM (
+		SELECT rownum idx, s.* FROM
+		(
+		SELECT
+		qnano,qnawriter,qnatitle,qnadate,qnainquiry
+		FROM qna
+		ORDER BY qnano DESC
+		) s
+		)
+		WHERE idx >= #{startRowNum} AND idx &lt;= #{endRowNum}
+	</select>
+
+	<!-- 게시물 데이터수 알아내기 -->
+	<select id="boardQnaCount" resultType="int">
+		select count(*) from qna
+	</select>
+
+	<!-- 게시물 상세보기 (게시물번호로 찾기) -->
+	<select id="boardQnaSelectByQnaNo"
+		resultType="com.itwill.board.boardQna.BoardQna" parameterType="_int">
+		select *
+		from qna where qnano = #{qnano}
+	</select>
+
+	<!-- 게시물 작성하기 -->
+	<insert id="boardQnaInsert"
+		parameterType="com.itwill.board.boardQna.BoardQna">
+		<selectKey resultType="java.lang.Integer"
+			keyProperty="qnano" order="BEFORE">
+			SELECT qna_no_seq.nextval FROM DUAL
+		</selectKey>
+		insert into
+		qna(qnano,qnawriter,qnatitle,qnacontent,qnadate,qnainquiry)
+		values(#{qnano},#{qnawriter},#{qnatitle},#{qnacontent},sysdate,#{qnainquiry})
+	</insert>
+
+	<!-- 게시물 수정하기 -->
+	<update id="boardQnaUpdate"
+		parameterType="com.itwill.board.boardQna.BoardQna">
+		update qna set
+		qnawriter=#{qnawriter},qnatitle=#{qnatitle},qnacontent=#{qnacontent}
+		where qnano=#{qnano}
+	</update>
+
+	<!-- 게시물 삭제하기 -->
+	<delete id="boardQnaDeleteByNo" parameterType="Integer">
+		delete from qna
+		where qnano = #{qnano}
+	</delete>
+
+	<!-- 문의게시물 조회수 증가 -->
+	<update id="boardQnaInquiryUpdate">
+		update qna set qnainquiry = qnainquiry + 1 where
+		qnano=#{qnano}
+	</update>
+
+</mapper>

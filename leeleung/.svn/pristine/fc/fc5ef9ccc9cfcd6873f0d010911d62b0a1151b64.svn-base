@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>글쓰기</title>
+<style>
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+body {
+	font-family: 'Nanum Gothic', sans-serif;
+}
+</style>
+
+<script type="text/javascript">
+	function move(url) {
+		location.href=url;
+	}
+	function modify_Action() {
+		f.action = "guest_modify_action.do";
+		document.f.method = 'POST';
+		f.submit();
+	}
+</script>
+</head>
+<!-- 작성자,타이틀,내용 -->
+<body>
+	<form id='f' name='f' method="post">
+	<input type="hidden" name="noticeno" value="${boardNotice.noticeno}">
+		<table summary="테이블 구성" >
+		<caption>게시판 글쓰기</caption>	
+    		<tr>
+				<td>작성자</td>
+				<td><input type=text name=noticewriter size=10 maxlength=8 value="${boardNotice.noticewriter}"></td>
+			</tr>
+    		<tr>
+     			<td>제 목</td>
+     			<td><input type=text name=noticetitle value="${boardNotice.noticetitle}"></td>
+    		</tr>
+    		<tr>
+     			<td>내 용</td>
+     			<td><textarea name=noticecontent rows ="10" cols="100" >${boardNotice.noticecontent}</textarea></td>
+    		</tr>
+    		<tr>
+     			<td colspan=2><hr size=1></td>
+    		</tr>
+    		<tr>
+     			<td colspan="2"><div align="center">
+     			<input type="button" value="등록" onclick="modify_Action();"></div>
+         		<input type="button" value="뒤로" onclick="move('boardNoticeList.do');"></div>
+     			</td>
+    		</tr> 
+		</table>
+	</form> 
+
+
+</body>
+</html>
